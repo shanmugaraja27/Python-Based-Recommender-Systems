@@ -1,0 +1,34 @@
+#Recommeder lists for e-commerce shopping based on two distinct approaches
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+plt.style.use("ggplot")
+import sklearn
+from sklearn.decomposition import TruncatedSVD
+#Approach 1
+amazon_ratings= pd.read_csv("ratings_Beauty.csv")
+popular_products = pd.DataFrame(amazon_ratings.groupby('ProductId')['Rating'].count())
+most_popular = popular_products.sort_values('Rating', ascending=False)
+most_popular.head(10)
+popular_products = pd.DataFrame(amazon_ratings.groupby('ProductId')['Rating'].count())
+most_popular = popular_products.sort_values('Rating', ascending=False)
+most_popular.head(10)
+
+#Approach 2
+amazon_ratings1 = amazon_ratings.head(10000)
+ratings_utility_matrix = amazon_ratings1.pivot_table(values='Rating', index='UserId', columns='ProductId', fill_value=0)
+ratings_utility_matrix.head()
+X = ratings_utility_matrix.T
+X.head()
+X1 = X
+SVD = TruncatedSVD(n_components=10)
+decomposed_matrix = SVD.fit_transform(X)
+correlation_matrix = np.corrcoef(decomposed_matrix)
+correlation_matrix
+i = "6117036094"
+product_names = list(X.index)
+product_ID = product_names.index(i)
+correlation_product_ID = correlation_matrix[product_ID]
+Recommend = list(X.index[correlation_product_ID > 0.90])
+Recommend.remove(i) 
+Recommend[0:9]
